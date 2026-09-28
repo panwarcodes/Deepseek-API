@@ -122,6 +122,10 @@ def list_models():
 
 @app.post("/v1/chat/completions")
 async def chat_completions(req: ChatCompletionRequest):
+    # DEBUG — remove once verified working.
+    print(f"[req] msgs={len(req.messages)} cid={req.conversation_id!r} "
+          f"first_user={(req.messages[0].content if req.messages else '')[:40]!r}")
+
     if not req.messages:
         return _error("`messages` must not be empty", status=400,
                       err_type="invalid_request_error")
@@ -152,6 +156,11 @@ async def chat_completions(req: ChatCompletionRequest):
             cached = SESSION_CACHE.get(task_key)
             if cached is not None:
                 conversation_id = cached.conversation_id
+                # DEBUG — remove once verified working.
+                print(f"[cache] HIT  key={task_key[:8]} -> cid={conversation_id}")
+            else:
+                # DEBUG — remove once verified working.
+                print(f"[cache] MISS key={task_key[:8]} (new task)")
 
     # --- Decide what text to actually send to DeepSeek ----------------------
     #
